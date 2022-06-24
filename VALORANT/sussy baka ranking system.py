@@ -1,9 +1,9 @@
 # This is just a dumb project to imitate the Valorant ranking system
+# This code has more autism than me, and I;m pretty autistic.
 import random
 import os
 
 def cc():   # shortened this long command to cc()
-    # the long version is required in some places
     os.system("cls" if os.name == "nt" else "clear")
 cc()
 
@@ -82,10 +82,11 @@ def main():
             current_rank_rr += rr
             print("gained " + str(rr) + "RR")
             
-    possible better way of doing this rather than 
+    possible "better" way of doing this rather than 
     the if statements mess below. The if statements
     can account for overtime where many rounds are played,
-    but the above list is fixed.
+    but the above list is fixed. In the future the whole
+    system should be revamped
 
     """
 

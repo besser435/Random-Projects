@@ -34,7 +34,11 @@ remove_non_games()
 
 print("Fetching playtime (this may take a while)")
 def get_val_playtime():
+
+    #                     "updated-file.json"
     obj = json.load(open("valorant_match_history.json"))
+
+
     total_playtime = 0
     for i in range(len(obj)):
 
@@ -55,7 +59,7 @@ def get_val_playtime():
     # fetch total playtime
         total_playtime += game_seconds
     print(total_playtime)
-    
+
     # print total_playtime in hours, minutes, seconds
     hours = total_playtime // 3600
     minutes = (total_playtime % 3600) // 60

@@ -1,27 +1,35 @@
-from xml.etree.ElementTree import TreeBuilder
 import board
 import random
+import os
 from time import sleep
-import adafruit_vl53l4cd
+import adafruit_vl53l0x 
+import adafruit_bh1750
+#pip3 install adafruit-circuitpython-vl53l0x
+#https://learn.adafruit.com/adafruit-vl53l0x-micro-lidar-distance-sensor-breakout/python-circuitpython
 from adafruit_motorkit import MotorKit
 
 i2c = board.I2C()
 
-# Time of flight sensor
-tof0 = adafruit_vl53l4cd.VL53L4CD(i2c)
-tof0.inter_measurement = 0
-tof0.timing_budget = 100 # 200 is the default. 
+# Time of Flight LIDAR Sensors
+tof0 = adafruit_vl53l0x.VL53L0X(i2c)
+tof0.measurement_timing_budget = 100000 # 200000 is the default, 200ms
 
-tof1 = adafruit_vl53l4cd.VL53L4CD(i2c) # change to the right address!
-tof1.inter_measurement = 0
-tof1.timing_budget = 100 # 200 is the default. 
+# Ambient light sensor
+amb_light = adafruit_bh1750.BH1750(i2c)
 
 # Motor driver
 kit = MotorKit()
 
 # Options
-avoid_threshold = 4 # distance in centimeters before turning
+avoid_threshold = 200 # distance in mm before turning
 turn_speed = 0.5
+headlight_threshold = 200
+
+
+def cc():   # shortens this long command to just cc()
+    os.system("cls" if os.name == "nt" else "clear")    # clears terminal
+cc()
+
 
 def stop():
     kit.motor1.throttle = 0
@@ -48,26 +56,87 @@ def motor(move_type, speed):
         kit.motor2.throttle = -turn_speed
 
     elif move_type == "right":
-        # left but inverted motor values
-        pass
+        kit.motor1.throttle = -turn_speed
+        kit.motor2.throttle = turn_speed
 
 
 
-def prototype_movement():
-    # rather than just moving forwards until it hits something,
-    # the robot could just turn to where it has more space. then it runs the 
-    # collision avoidance bit if it detects that the distance is less than the avoid_threshold.
+# https://www.elecfreaks.com/learn-en/microbitKit/smart_cutebot/index.html
+# https://docs.circuitpython.org/projects/tca9548a/en/latest/examples.html
+def menu():
+    print("Select move type: ")
+    print("1. Object Avoidance") # could use both sensors to steer in most open direction, or use 
+    # 1 to just detect, then change course
+    print("2. Follow At Fixed Distance")
+    print("3. Speed Up Gradually")
+    print("4. Random")
+    print("5. Remote Control")
 
-    # It might jitter a bit from the sensors not matching perfectly, so if the distance to an
-    # object is more than X, just make it go forwards. rather than the above movement method.
-    # Or you could just make it so that the two sensors must differ by a certain amount before it steers.
+
+"""def headlight(): # this should be a thread
+    while True:
+        if amb_light.lux < headlight_threshold:
+            print("Low Light detected")
+            #light strip on
+        else:
+            #lights off
+        print("%.2f Lux" % amb_light.lux)
+        sleep(2)"""
+
+
+def object_avoidance(): # uses two sensors to detect the best direction to go
+    while True:
+        # average of both sensors
+        lid0 = tof0.range #fetch range
+
+        cc()
+        print("Range: {}mm".format(lid0))
+
+
+        
+        motor("for", 1)
+
+        # get range (both sensors averaged)
+        # if range is less than avoid_threshold, turn towards the sensor that is further away
+        # if range is greater than avoid_threshold, continue forwards
+
+        if lid0 < avoid_threshold:
+            print("Object detected")
+  
+                    
+
+
+
+def follow_at_distance():
+    follow_dist = 80 # distance to keep to the object in mm
     
+    while True:
+        lid0 = tof0.range
+        
+        cc()
+        if lid0 < headlight_threshold + 2 or lid0 < avoid_threshold - 2:    # checks that the robot is whthin 2mm of object threshold
+            print("Range: {}mm".format(lid0))
+            print("Moving backwards")
+            motor("back", 1)
 
-    # to have 2 sensors, they would need to have different I2C addresses. you cant change the I2C address on them.
-    pass
+        elif lid0 > headlight_threshold + 2 or lid0 > avoid_threshold - 2:
+            print("Range: {}mm".format(lid0))
+            print("Moving forwards")
+            motor("for", 1)
 
 
-def main(): 
+        
+
+        
+
+
+
+
+
+
+
+
+def old(): 
     avoid_dir = ("left", "right")   
     random_avoid_dir = random.choice(avoid_dir) 
     
@@ -89,6 +158,10 @@ def main():
 
         motor("for", 1)
 
+        # prints status info about what the robot is doing
+        print("Moving ")
+        print("Range to object: {} cm".format(range0))
+
 
         if range0 < avoid_threshold:
             print("Yo mama detected")
@@ -101,6 +174,8 @@ def main():
                 print("Error - stuck. add a feature where it keeps turning until it finds a new route")
                 #break
 
+    
+    
 print("main() done")
 
 

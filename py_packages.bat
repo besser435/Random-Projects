@@ -12,6 +12,8 @@ pip3 install gpiozero
 pip3 install picamera
 
 pip3 install Adafruit-Blinka
+pip3 install adafruit-circuitpython-displayio-ssd1306
+pip3 install adafruit-blinka-displayio
 ::pip3 install Adafruit-SSD1306 DEPRECATED, use displayio
 pip3 install adafruit-circuitpython-neopixel
 pip3 install adafruit-circuitpython-icm20x

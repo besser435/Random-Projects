@@ -1,0 +1,41 @@
+
+//maybe just make it a find and replace thing.
+
+
+
+
+
+
+string name = "bob"
+string message = "hi bob"
+
+var int myInt = 0
+
+println(myInt)
+
+int myInt + 1
+
+send(myInt)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+condition > if (name is "bob"):
+statement > send(message)
+statement > end
+
+// condition says that its a condition
+// > points to what the condition is and what should be translated to python code
+// end shows that indentation in the python code is done and that there is no more code to be translated for the condition

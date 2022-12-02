@@ -1,0 +1,28 @@
+// test comment
+test comment
+
+int sexNumber = 69  // test comment
+float weedNumber = 420.69
+println(message)
+print(message)
+delay(420)
+
+if (sexNumber == 69)
+println(hi mom)
+
+while (True)
+    println(jayce from sex teck)
+
+
+
+loop while (True)
+pass
+
+var int sexNumber = 69
+out println (message)
+
+filter if True
+pass
+
+filter elif False
+pass

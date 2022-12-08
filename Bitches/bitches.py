@@ -1,6 +1,6 @@
 import random
-
-random.seed(input("Enter your name: "))
+salt = 0    # lets you alter the output of the RNG. Refer to salt_bitches.py
+random.seed(input("Enter your name: ")+ str(salt)) 
 bitches = random.randint(0, 10)
 
 if bitches == 0:

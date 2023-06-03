@@ -5,6 +5,7 @@ times_clicked = 0
 money_lost = 0
 start_time = time.time()
 try:
+    time.sleep(2)
     print("Clicking...")
     while True:
         pydirectinput.mouseDown()

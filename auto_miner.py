@@ -5,6 +5,7 @@ times_clicked = 0
 money_lost = 0
 start_time = time.time()
 try:
+    time.sleep(2)
     print("Clicking...")
     while True:
         pydirectinput.mouseDown()
@@ -13,10 +14,13 @@ try:
         # allows the player to carry two tools for increased farm time by switching tools in offhand
         pydirectinput.press("f") 
         
-        time.sleep(2.5) # jobs plugin cooldown delay
+        time.sleep(2) # jobs plugin cooldown delay
         times_clicked += 1
         money_lost += 5.15
 
+        pydirectinput.press("t")
+        pydirectinput.press("esc")
+        
 except KeyboardInterrupt:
     end_time = time.time()
     print("Done clicking")

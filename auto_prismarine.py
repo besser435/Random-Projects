@@ -50,11 +50,13 @@ try:
     print("Mining...")
     initial_time = time.monotonic()
 
+    
     while True: 
         pydirectinput.mouseDown()
         current_time = time.monotonic()
         time_stamp = current_time - initial_time + 1    # +1 to not trigger refill_picks() on the first loop
-
+        
+        pydirectinput.mouseDown()
         mouse.wheel(-1) # cycle through picks in hotbar
         sleep(1)
 
@@ -63,8 +65,7 @@ try:
             pydirectinput.mouseUp()
             refill_picks()
             refill_counter += 1
-            pydirectinput.mouseDown()
-        print("refill in", 3600 - (round(time_stamp) % 3600), "seconds")
+        print("Refill in", 3600 - (round(time_stamp) % 3600), "seconds")
 
         if keyboard.is_pressed("f7"):
             raise KeyboardInterrupt

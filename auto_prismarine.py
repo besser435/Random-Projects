@@ -3,7 +3,7 @@ from time import sleep
 # https://learncodebygaming.com/blog/pyautogui-not-working-use-directinput
 
 # time in seconds before pick refill. 4000 seems to be right for Unbreaking III
-REFILL_DELAY = 4000
+REFILL_DELAY = 4450 #4450
 
 refill_counter = 0
 
@@ -58,7 +58,8 @@ try:
         time_stamp = int(current_time - initial_time + 1)    # +1 to not trigger refill_picks() on the first loop
        
         pydirectinput.mouseDown()
-        mouse.wheel(-1) # cycle through picks in hotbar
+        mouse.wheel(-1)             # cycle through picks in hotbar
+        pydirectinput.press("a")    # timeout prevention
         sleep(1)
 
         # if 4000, refills picks every 1.11 hours (about the time a pick lasts)

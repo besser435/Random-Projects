@@ -1,15 +1,16 @@
 import time
-import ntplib
-import os
-
-import busio
-#import board
-#import adafruit_veml7700
+import board
 import neopixel
 
+import adafruit_ntp
+import socketpool
+import time
+import wifi
+import os
+#import adafruit_veml7700
 
 
-DISPLAY_BRIGHTNESS = 1
+DISPLAY_BRIGHTNESS = 0.1
 SHUTOFF_LUX_THRESHOLD = 10
 
 H_COLOR = (255, 0, 0)
@@ -20,34 +21,37 @@ S_COLOR = (0, 0, 255)
 # Hardware setup
 #i2c = busio.I2C(board.SCL, board.SDA)
 #veml7700 = adafruit_veml7700.VEML7700(i2c)
-#led_neo = neopixel.NeoPixel(board.D18, 1)
+wifi.radio.connect(os.getenv("WIFI_SSID"), os.getenv("WIFI_PASSWORD"))
+pool = socketpool.SocketPool(wifi.radio)
+ntp = adafruit_ntp.NTP(pool, tz_offset=-7)   # Set timezone here
+
+led_neo = neopixel.NeoPixel(board.D10, 18, brightness=DISPLAY_BRIGHTNESS, auto_write=False, bpp=4)
+
 
 
 
 def binary_time():
     # Create an NTP client
-    """    
-    https://www.ntppool.org/en/tos.html
-    Dont set more often than every 30 minutes
-    try:
-            client = ntplib.NTPClient()
-            response = client.request("pool.ntp.org")
-
-            # Get the current time from the response
-            current_time = time.localtime(response.tx_time)
-        except Exception as e:
-            print("Error: ", e)"""
-    current_time = time.localtime()
-
-
+    current_time = ntp.datetime
     hours = current_time.tm_hour
     mins = current_time.tm_min
     secs = current_time.tm_sec
 
-    bin_hours = bin(hours)[2:].zfill(6) # NOTE must match pixel count for each time unit
-    bin_mins = bin(mins)[2:].zfill(6)
-    bin_secs = bin(secs)[2:].zfill(6)
-    print(bin_hours, bin_mins, bin_secs)
+    #bin_hours = bin(hours)[2:].zfill(6) # NOTE must match pixel count for each time unit
+    #bin_mins = bin(mins)[2:].zfill(6)
+    #bin_secs = bin(secs)[2:].zfill(6)
+
+    bin_hours = bin(hours)[2:]  # CircuitPython doesn't have zfill
+    bin_hours = "0" * (6 - len(bin_hours)) + bin_hours
+
+    bin_mins = bin(mins)[2:]
+    bin_mins = "0" * (6 - len(bin_mins)) + bin_mins
+
+    bin_secs = bin(secs)[2:]
+    bin_secs = "0" * (6 - len(bin_secs)) + bin_secs
+
+    print(f"{hours}:{mins}:{secs}")    
+    print(f"{bin_hours}:{bin_mins}:{bin_secs}")
 
     return bin_hours, bin_mins, bin_secs
 
@@ -69,27 +73,21 @@ def paint_display():
     """
     Hour, minute, second each get 6 bits/pixels for the 
     binary display.
-    
     """
 
     bin_hours, bin_mins, bin_secs = binary_time()
     binary_values = bin_hours + bin_mins + bin_secs
-    # count the number of chars in the binary string
-    print("binary length",len(binary_values))
-    
-        
-    for i in range(18):
-        #print(binary_values)
-
+    zero_color = (0, 0, 0)
+    for i in range(len(binary_values)):
         if i < 6:
-            target_color = H_COLOR if binary_values[i] == '1' else (3, 3, 3)
+            target_color = H_COLOR if binary_values[i] == "1" else zero_color
         elif i < 12:
-            target_color = M_COLOR if binary_values[i] == '1' else (2, 2, 2)
+            target_color = M_COLOR if binary_values[i] == "1" else zero_color
         else:
-            target_color = S_COLOR if binary_values[i] == '1' else (1, 1, 1)
-        #led_neo[i] = target_color
-        print(target_color)
-
+            target_color = S_COLOR if binary_values[i] == "1" else zero_color
+        led_neo[i] = target_color
+        print(led_neo[i])
+    
 
 
         """
@@ -110,13 +108,14 @@ def paint_display():
 
         led_neo[i] = target_color  # Set the final color"""
 
+    led_neo.show()
 
-    
 
 while True:
     paint_display()
     #light_shutoff()
 
     time.sleep(1)
-    os.system('cls' if os.name == 'nt' else 'clear')
+    print("\n" * 3)
+
 
